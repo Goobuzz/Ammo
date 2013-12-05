@@ -88,18 +88,19 @@ define([
 		this.ammoRB.getMotionState().getWorldTransform(ptrans);
 		origin = ptrans.getOrigin();
 		pquat = ptrans.getRotation();
-		//quaternion.setd(pquat.x(), pquat.y(), pquat.z(), pquat.w());
+		
 
 		this.newPos.setd(origin.x()+this.offsetPosition.x, origin.y()+this.offsetPosition.y, origin.z()+this.offsetPosition.z);
 		this.newRot.setd(pquat.x(), pquat.y(), pquat.z(), pquat.w());
 		
+		//quaternion.setd(pquat.x(), pquat.y(), pquat.z(), pquat.w());
 		//this.position.setd(origin.x(), origin.y(), origin.z());
 		//this.rotation.copyQuaternion(quaternion);
 		//this.entity.transformComponent.setUpdated();
 	}
 
 	RigidbodyComponent.prototype._renderUpdate = function(){
-		this.position.setd(
+		/*this.position.setd(
 			(this.newPos.x * Time.alpha) + (this.oldPos.x * Time.negAlpha),
 			(this.newPos.y * Time.alpha) + (this.oldPos.y * Time.negAlpha),
 			(this.newPos.z * Time.alpha) + (this.oldPos.z * Time.negAlpha)
@@ -111,6 +112,20 @@ define([
 			(this.newRot.w * Time.alpha) + (this.oldRot.w * Time.negAlpha)
 			);
 		this.entity.transformComponent.transform.rotation.copyQuaternion(quaternion);
+		this.entity.transformComponent.setUpdated();*/
+
+		this.position.setd(
+			this.newPos.x,
+			this.newPos.y,
+			this.newPos.z
+			);
+		quaternion.setd(
+			this.newRot.x,
+			this.newRot.y,
+			this.newRot.z,
+			this.newRot.w
+			);
+		this.rotation.copyQuaternion(quaternion);
 		this.entity.transformComponent.setUpdated();
 	}
 

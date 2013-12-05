@@ -24,7 +24,7 @@ function (
 	Time.contstructor = Time;
 	Time.fps = 60;
 	Time.dt = 1.0 / Time.fps; // smoothed dt
-	Time.fixedFPS = 150;
+	Time.fixedFPS = 100;
 	Time.fixedDT = 1.0 / Time.fixedFPS;
 	Time.time = 0.0;;
 	Time.timeScale = 1.0;
@@ -45,17 +45,17 @@ function (
 
 		Game.raiseEvent("Update");
 
-		while(Time.fixedDT < this._accumulated){
-			Game.raiseEvent("FixedUpdate");
-			if(Game.ammoWorld){
-				Game.ammoWorld.stepSimulation(Time.fixedDT, 0);
-				Game.raiseEvent("AmmoUpdate");
-			}
-			this._accumulated -= Time.fixedDT;
-		}
+		//while(Time.fixedDT < this._accumulated){
+			//Game.raiseEvent("FixedUpdate");
+			//if(Game.ammoWorld){
+			//	Game.ammoWorld.stepSimulation(Time.fixedDT, 0);
+			//	Game.raiseEvent("AmmoUpdate");
+			//}
+			//this._accumulated -= Time.fixedDT;
+		//}
 
-		Time.alpha = this._accumulated / Time.fixedDT;
-		Time.negAlpha = 1 - Time.alpha;
+		//Time.alpha = this._accumulated / Time.fixedDT;
+		//Time.negAlpha = 1 - Time.alpha;
 
 		Game.raiseEvent("RenderUpdate");
 		Game.raiseEvent("LateUpdate");

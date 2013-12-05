@@ -89,6 +89,17 @@ require([
 		// TODO:  Do this updating in a Worker()
 		
 		//setInterval(function(){ammoWorld.stepSimulation(1/60, 5)}, 1000/60);
+
+		var oldTime = Time.time;
+		Time.worker = new Worker('js/AmmoTime.js');
+		Time.worker.addEventListener('message', function(e){
+			Game.ammoWorld.stepSimulation(Time.time - oldTime, 10);
+			Game.raiseEvent("FixedUpdate");
+			Game.raiseEvent("AmmoUpdate");
+			oldTime = Time.time;
+			//console.log("Ammo:"+Time.time);
+		}, false);
+		Time.worker.postMessage();
 	}
 
 	function createAmmoMeshShape(entity){
