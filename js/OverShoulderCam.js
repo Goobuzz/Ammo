@@ -115,11 +115,23 @@ define([
 			this.pivot0.transformComponent.transform.rotation.fromAngles(this.p0Rot.x, this.p0Rot.y, this.p0Rot.z);
 			this.pivot0.transformComponent.setUpdated();
 		}
-		
 	}
 
 	function lateUpdate(){
+		this.ray.origin.copy(this.pivot1.transformComponent.worldTransform.translation);
+		Vector3.sub(this.pivot2.transformComponent.worldTransform.translation, this.ray.origin, this.ray.direction);
+		this.ray.direction.normalize();
+		this.pivot2.transformComponent.transform.translation.z = -this.wantDistance;
+		var hit = Game.castRay(this.ray, 1);
+		if(hit != null){
+			console.log(hit.distance);
+			if(hit.distance < this.wantDistance){
+				this.pivot2.transformComponent.transform.translation.z = -hit.distance;
+			}
+		}
+		this.pivot2.transformComponent.setUpdated();
 		this.camEntity.transformComponent.setTranslation(this.pivot2.transformComponent.worldTransform.translation);
+		// change this
 		this.camEntity.transformComponent.lookAt(this.pivot1.transformComponent.worldTransform.translation, Vector3.UNIT_Y);
 		this.camEntity.transformComponent.setUpdated();
 	}
