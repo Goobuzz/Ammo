@@ -16,7 +16,7 @@ function (
 
 		this._avg = (2/(1 + Time.fps)); // dt average
 		this._maxFrame = this._ft * 10;
-		this._accumulated = 0.0;
+		//this._accumulated = 0.0;
 		this.world = goo;
 		System.call(this, "Time", []);
 	};
@@ -30,6 +30,7 @@ function (
 	Time.timeScale = 1.0;
 	Time.alpha = 0.0;
 	Time.negAlpha = 0.0;
+	Time.accumulated = 0.0;
 	Time.prototype.process = function(entities, tpf){
 		if(tpf > this._maxFrame){tpf = this._maxFrame;}
 
@@ -41,25 +42,29 @@ function (
 
 		Time.dt = this._ft + this._tr;
 		Time.time += Time.dt;
-		this._accumulated += Time.dt;
 
 		Game.raiseEvent("Update");
-
-		//while(Time.fixedDT < this._accumulated){
-			//Game.raiseEvent("FixedUpdate");
-			//if(Game.ammoWorld){
-			//	Game.ammoWorld.stepSimulation(Time.fixedDT, 0);
-			//	Game.raiseEvent("AmmoUpdate");
-			//}
-			//this._accumulated -= Time.fixedDT;
-		//}
-
-		//Time.alpha = this._accumulated / Time.fixedDT;
-		//Time.negAlpha = 1 - Time.alpha;
-
 		Game.raiseEvent("RenderUpdate");
 		Game.raiseEvent("LateUpdate");
 	};
+
+	var oldTime = Time.time;
+	Time.worker = new Worker('js/FixedTime.js');
+	Time.worker.addEventListener('message', function(e){
+		Time.accumulated += Time.time - oldTime;
+		while(Time.fixedDT < Time.accumulated){
+			Game.raiseEvent("FixedUpdate");
+			if(Game.ammoWorld){
+				Game.raiseEvent("AmmoUpdate");
+				Game.ammoWorld.stepSimulation(Time.fixedDT, 0);
+			}
+			Time.accumulated -= Time.fixedDT;
+		}
+		Time.alpha = Time.accumulated / Time.fixedDT;
+		Time.negAlpha = 1 - Time.alpha;
+		oldTime = Time.time;
+	}, false);
+	Time.worker.postMessage(Time.fixedDT);
 
 	return Time;
 });
