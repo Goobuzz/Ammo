@@ -5,10 +5,9 @@
             "Level/materials/Level_Material.material",
             "Level/entities/RootNode.entity",
             "Level/entities/Box01_0.entity",
-            "Level/binaries/1385849674_data.bin",
-            "Level/binaries/1385849724_data.bin",
-            "Level/binaries/1385849982_data.bin",
-            "Level/binaries/1385850070_data.bin"
+            "Level/binaries/1386342071_data.bin",
+            "Level/entities/PointLight.entity",
+            "Level/entities/PointLight_0.entity"
         ],
         "name": "Level",
         "ref": "Level/Level.group"
@@ -21,6 +20,7 @@
             "meshRenderer": {
                 "castShadows": true,
                 "cullMode": "Dynamic",
+                "hidden": false,
                 "materialRefs": [
                     "Level/materials/Level_Material.material"
                 ],
@@ -30,24 +30,149 @@
             "transform": {
                 "parentRef": "Level/entities/RootNode.entity",
                 "rotation": [
-                    0.0,
-                    -0.0,
-                    0.0
+                    0,
+                    0,
+                    0
                 ],
                 "scale": [
-                    1.0,
-                    1.0,
-                    1.0
+                    1,
+                    1,
+                    1
                 ],
                 "translation": [
-                    0.0,
+                    0,
                     2.343853822139863e-08,
-                    -1.0
+                    0
                 ]
             }
         },
         "name": "Box01",
-        "nodeType": "Mesh"
+        "nodeType": "Mesh",
+        "ref": "Level/entities/Box01_0.entity"
+    },
+    "Level/entities/PointLight.entity": {
+        "components": {
+            "light": {
+                "attenuate": true,
+                "color": [
+                    0.9636363636363636,
+                    0.9116159278737791,
+                    0.34165289256198345,
+                    1
+                ],
+                "direction": [
+                    0,
+                    0,
+                    0
+                ],
+                "intensity": 1,
+                "lightCookie": null,
+                "range": 50,
+                "shadowCaster": false,
+                "shadowSettings": {
+                    "darkness": 0,
+                    "far": 50,
+                    "fov": 55,
+                    "near": 1,
+                    "projection": "Perspective",
+                    "resolution": [
+                        256,
+                        256
+                    ],
+                    "shadowType": "VSM",
+                    "size": 400,
+                    "type": "Blur",
+                    "upVector": [
+                        0,
+                        1,
+                        0
+                    ]
+                },
+                "specularIntensity": 1,
+                "type": "PointLight"
+            },
+            "transform": {
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "translation": [
+                    -8.984298706054688,
+                    25.630630493164062,
+                    -14.283855438232422
+                ]
+            }
+        },
+        "name": "PointLight",
+        "ref": "Level/entities/PointLight.entity"
+    },
+    "Level/entities/PointLight_0.entity": {
+        "components": {
+            "light": {
+                "attenuate": true,
+                "color": [
+                    0.5949024793388428,
+                    0.16181818181818178,
+                    0.8090909090909091,
+                    1
+                ],
+                "direction": [
+                    0,
+                    0,
+                    0
+                ],
+                "intensity": 1.06,
+                "lightCookie": null,
+                "range": 50,
+                "shadowCaster": false,
+                "shadowSettings": {
+                    "darkness": 0,
+                    "far": 50,
+                    "fov": 55,
+                    "near": 1,
+                    "projection": "Perspective",
+                    "resolution": [
+                        256,
+                        256
+                    ],
+                    "shadowType": "VSM",
+                    "size": 400,
+                    "type": "Blur",
+                    "upVector": [
+                        0,
+                        1,
+                        0
+                    ]
+                },
+                "specularIntensity": 1,
+                "type": "PointLight"
+            },
+            "transform": {
+                "rotation": [
+                    0,
+                    0,
+                    0
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "translation": [
+                    35.461585998535156,
+                    25.630630493164062,
+                    20.440135955810547
+                ]
+            }
+        },
+        "name": "PointLight",
+        "ref": "Level/entities/PointLight_0.entity"
     },
     "Level/entities/RootNode.entity": {
         "components": {
@@ -79,64 +204,54 @@
             "blendSrc": "SrcAlphaFactor",
             "blending": "NoBlending"
         },
-        "cullState": {
-            "cullFace": "Back",
-            "enabled": true,
-            "frontFace": "CCW"
-        },
-        "depthState": {
-            "enabled": true,
-            "write": true
-        },
         "name": "Level Material",
-        "ref": "Level/materials/Level_Material.material",
-        "renderQueue": 1000,
+        "renderQueue": -1,
         "shaderRef": "GOO_ENGINE_SHADERS/uber",
         "texturesMapping": {},
         "type": "Phong",
         "uniforms": {
             "discardThreshold": {
                 "enabled": false,
-                "value": 0
+                "value": 0.0
             },
             "fresnel": {
                 "enabled": true,
-                "value": 0
+                "value": 0.0
             },
             "materialAmbient": {
                 "enabled": true,
                 "value": [
-                    0.3909090909090909,
-                    0.3909090909090909,
-                    0.3909090909090909,
-                    1
+                    0.5882353186607361,
+                    0.5882353186607361,
+                    0.5882353186607361,
+                    1.0
                 ]
             },
             "materialDiffuse": {
                 "enabled": true,
                 "value": [
-                    1,
-                    1,
-                    1,
-                    1
+                    0.5882353186607361,
+                    0.5882353186607361,
+                    0.5882353186607361,
+                    1.0
                 ]
             },
             "materialEmissive": {
                 "enabled": true,
                 "value": [
-                    0,
-                    0,
-                    0,
-                    1
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
                 ]
             },
             "materialSpecular": {
                 "enabled": true,
                 "value": [
-                    0.509090909090909,
-                    0.509090909090909,
-                    0.509090909090909,
-                    1
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0
                 ]
             },
             "materialSpecularPower": {
@@ -145,20 +260,20 @@
             },
             "normalMultiplier": {
                 "enabled": true,
-                "value": 1
+                "value": 1.0
             },
             "opacity": {
                 "enabled": true,
-                "value": 1
+                "value": 1.0
             },
             "reflectivity": {
                 "enabled": true,
-                "value": 0
+                "value": 0.0
             }
         }
     },
     "Level/meshes/Box01_0.mesh": {
-        "binaryRef": "Level/binaries/1385850070_data.bin",
+        "binaryRef": "Level/binaries/1386342071_data.bin",
         "boundingVolume": {
             "max": [
                 23.88897132873535,
@@ -210,150 +325,92 @@
             "float32"
         ]
     },
-    "entities/DirectionalLight.entity": {
-        "components": {
-            "light": {
-                "attenuate": true,
-                "color": [
-                    0.6363636363636364,
-                    0.7104132231404958,
-                    1,
-                    1
-                ],
-                "direction": [
-                    0,
-                    0,
-                    0
-                ],
-                "intensity": 1,
-                "lightCookie": null,
-                "shadowCaster": false,
-                "shadowSettings": {
-                    "darkness": 0,
-                    "far": 1000,
-                    "fov": 55,
-                    "near": 1,
-                    "projection": "Parallel",
-                    "resolution": [
-                        256,
-                        256
-                    ],
-                    "shadowType": "VSM",
-                    "size": 400,
-                    "type": "Blur",
-                    "upVector": [
-                        0,
-                        1,
-                        0
-                    ]
-                },
-                "specularIntensity": 1,
-                "type": "DirectionalLight"
-            },
-            "transform": {
-                "rotation": [
-                    -76.78974046094568,
-                    -49.86359113000299,
-                    -5.843481686379315
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "translation": [
-                    0,
-                    0,
-                    0
-                ]
-            }
+    "posteffects/Bleach.posteffect": {
+        "enabled": false,
+        "name": "Bleach",
+        "options": {
+            "opacity": 1
         },
-        "name": "DirectionalLight",
-        "ref": "entities/DirectionalLight.entity"
+        "ref": "posteffects/Bleach.posteffect"
     },
-    "entities/DirectionalLight_0.entity": {
-        "components": {
-            "light": {
-                "attenuate": true,
-                "color": [
-                    0.8727272727272728,
-                    0.42049586776859504,
-                    0.42049586776859504,
-                    1
-                ],
-                "direction": [
-                    0,
-                    0,
-                    0
-                ],
-                "intensity": 1,
-                "lightCookie": null,
-                "shadowCaster": false,
-                "shadowSettings": {
-                    "darkness": 0,
-                    "far": 1000,
-                    "fov": 55,
-                    "near": 1,
-                    "projection": "Parallel",
-                    "resolution": [
-                        256,
-                        256
-                    ],
-                    "shadowType": "VSM",
-                    "size": 400,
-                    "type": "Blur",
-                    "upVector": [
-                        0,
-                        1,
-                        0
-                    ]
-                },
-                "specularIntensity": 1,
-                "type": "DirectionalLight"
-            },
-            "transform": {
-                "rotation": [
-                    -13.179186390356227,
-                    -28.423552193252092,
-                    -5.788831208395927
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "translation": [
-                    0.25,
-                    0,
-                    0.25
-                ]
-            }
+    "posteffects/Bloom.posteffect": {
+        "enabled": true,
+        "name": "Bloom",
+        "options": {
+            "brightness": -65,
+            "contrast": -8,
+            "opacity": 100,
+            "size": 2
         },
-        "name": "DirectionalLight",
-        "ref": "entities/DirectionalLight_0.entity"
+        "ref": "posteffects/Bloom.posteffect"
+    },
+    "posteffects/Contrast.posteffect": {
+        "enabled": false,
+        "name": "Contrast",
+        "options": {
+            "brightness": 0,
+            "contrast": 0
+        },
+        "ref": "posteffects/Contrast.posteffect"
+    },
+    "posteffects/Grain.posteffect": {
+        "enabled": false,
+        "name": "Grain",
+        "options": {
+            "nIntensity": 50,
+            "sCount": 1024,
+            "sIntensity": 50
+        },
+        "ref": "posteffects/Grain.posteffect"
+    },
+    "posteffects/RgbShift.posteffect": {
+        "enabled": false,
+        "name": "RgbShift",
+        "options": {
+            "amount": 0.005,
+            "angle": 0
+        },
+        "ref": "posteffects/RgbShift.posteffect"
+    },
+    "posteffects/Sepia.posteffect": {
+        "enabled": false,
+        "name": "Sepia",
+        "options": {
+            "amount": 100
+        },
+        "ref": "posteffects/Sepia.posteffect"
+    },
+    "posteffects/Vignette.posteffect": {
+        "enabled": false,
+        "name": "Vignette",
+        "options": {
+            "darkness": 1.5,
+            "offset": 1
+        },
+        "ref": "posteffects/Vignette.posteffect"
     },
     "project.project": {
         "backgroundColor": [
-            0.01311795642374152,
-            0.0074380165289256155,
-            0.1636363636363637,
+            0.75,
+            0.76,
+            0.78,
             1
         ],
-        "created": "2013-11-30T22:13:29.556916",
+        "created": "2013-12-06T15:00:01.791327",
         "deleted": false,
         "edit": [],
         "entityRefs": [
             "Level/entities/RootNode.entity",
             "Level/entities/Box01_0.entity",
-            "entities/DirectionalLight.entity",
-            "entities/DirectionalLight_0.entity"
+            "Level/entities/PointLight.entity",
+            "Level/entities/PointLight_0.entity"
         ],
         "fogColor": [
-            0.011764705882352941,
-            0.00392156862745098,
-            0.1607843137254902
+            1,
+            1,
+            1
         ],
-        "fogFar": 30,
+        "fogFar": 1000,
         "fogNear": 0,
         "globalAmbient": [
             0,
@@ -364,37 +421,56 @@
             "Level/Level.group",
             "root.group"
         ],
-        "id": "prKTgVJ4QNKqQK-_J_cO4w",
+        "id": "PLLRr7DzSx-A-F_ES2QIwA",
         "licenseType": "CC0",
-        "modified": "2013-11-30T22:13:29.556916",
-        "name": "Level",
+        "modified": "2013-12-06T15:00:01.791327",
+        "name": "Default Goo Project",
         "originalLicenseType": null,
         "own": [
             "h9AeW1X3S1WZYADWuViCyw"
         ],
         "parent": null,
+        "posteffectRefs": [
+            "posteffects/Sepia.posteffect",
+            "posteffects/Bloom.posteffect",
+            "posteffects/Grain.posteffect",
+            "posteffects/Contrast.posteffect",
+            "posteffects/RgbShift.posteffect",
+            "posteffects/Vignette.posteffect",
+            "posteffects/Bleach.posteffect"
+        ],
         "public": true,
         "ref": "project.project",
         "skybox": {
+            "attribution": {
+                "link": "http://www.3delyvisions.com/",
+                "name": "3DElyvisions"
+            },
             "environmentType": 1,
             "imageUrls": [
-                "",
-                "",
-                "",
-                "",
-                "",
-                ""
+                "GOO_ASSET_LIBRARY/images/elyvisions/sky26/skyhright.jpg",
+                "GOO_ASSET_LIBRARY/images/elyvisions/sky26/skyhleft.jpg",
+                "GOO_ASSET_LIBRARY/images/elyvisions/sky26/skyhup.jpg",
+                "GOO_ASSET_LIBRARY/images/elyvisions/sky26/skyhdown.jpg",
+                "GOO_ASSET_LIBRARY/images/elyvisions/sky26/skyhfront.jpg",
+                "GOO_ASSET_LIBRARY/images/elyvisions/sky26/skyhback.jpg"
             ],
+            "ref": "environment/Dark_Space.skybox",
             "rotation": 0,
             "shape": "Box"
         },
-        "useFog": true,
+        "useFog": false,
         "view": []
     },
     "root.group": {
         "libraryRefs": [
-            "entities/DirectionalLight.entity",
-            "entities/DirectionalLight_0.entity"
+            "posteffects/Sepia.posteffect",
+            "posteffects/Bloom.posteffect",
+            "posteffects/Grain.posteffect",
+            "posteffects/Contrast.posteffect",
+            "posteffects/RgbShift.posteffect",
+            "posteffects/Vignette.posteffect",
+            "posteffects/Bleach.posteffect"
         ],
         "name": "root",
         "ref": "root.group"

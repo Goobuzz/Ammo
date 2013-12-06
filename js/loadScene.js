@@ -19,7 +19,8 @@ require([
 	'js/Input',
 	'js/OverShoulderCam',
 	'js/RigidbodyComponent',
-	'js/CapsuleColliderComponent'
+	'js/CapsuleColliderComponent',
+	'js/CharacterController'
 
 ], function (
 	HowlerComponent,
@@ -42,7 +43,8 @@ require([
 	Input,
 	OverShoulderCam,
 	RigidbodyComponent,
-	CapsuleColliderComponent
+	CapsuleColliderComponent,
+	CharacterController
 ) {
 	'use strict';
 	// Ammo vars
@@ -160,7 +162,8 @@ require([
 	function createUserEntity(){
 		Game.userEntity = Game.world.createEntity("UserEntity");
 		Game.userEntity.addToWorld();
-		Game.userEntity.transformComponent.attachChild(Game.userMesh.transformComponent);
+		Game.userEntity.transformComponent.attachChild(Game.userLeggs.transformComponent);
+		Game.userEntity.transformComponent.attachChild(Game.userTorso.transformComponent);
 		Game.userEntity.transformComponent.setTranslation(0,25,0);
 		Game.userEntity.setComponent(new CapsuleColliderComponent(Game.userEntity, {radius:0.5, height:0.8}));
 		Game.userEntity.setComponent(new RigidbodyComponent(Game.userEntity, {mass:1.5}));
@@ -171,7 +174,7 @@ require([
 		Game.userEntity.rigidbodyComponent.setRestitution(0.0);
 		Game.userEntity.rigidbodyComponent.setOffsetPosition(0,-0.9,0);
 		
-		//Game.userEntity.setComponent(new CharacterController(Game.userEntity));
+		Game.userEntity.setComponent(new CharacterController(Game.userEntity));
 
 		Game.userEntity.setComponent(new OverShoulderCam(Game.userEntity));
 	}
@@ -197,7 +200,9 @@ require([
 			Game.levelMesh = loader.getCachedObjectForRef("Level/entities/Box01_0.entity");
 			Game.levelMesh.hitMask = 1;
 
-			Game.userMesh = loader.getCachedObjectForRef("Space_MarineIdle/entities/RootNode.entity");
+			Game.userLeggs = loader.getCachedObjectForRef("MarineBottom/entities/RootNode.entity");
+			Game.userTorso = loader.getCachedObjectForRef("MarineTop/entities/RootNode.entity");
+		//	Game.userMesh = loader.getCachedObjectForRef("Space_MarineIdle/entities/RootNode.entity");
 
 			initAmmoWorld();
 			createUserEntity();

@@ -44,11 +44,23 @@ function (
 		Time.time += Time.dt;
 
 		Game.raiseEvent("Update");
+
+		Time.accumulated += Time.dt;
+		while(Time.fixedDT < Time.accumulated){
+			Game.raiseEvent("FixedUpdate");
+			Time.accumulated -= Time.fixedDT;
+		}
+		if(Game.ammoWorld){
+			Game.ammoWorld.stepSimulation(Time.dt, 10);
+			Game.raiseEvent("AmmoUpdate");
+		}
+		//Time.alpha = Time.accumulated / Time.fixedDT;
+		//Time.negAlpha = 1 - Time.alpha;
 		Game.raiseEvent("RenderUpdate");
 		Game.raiseEvent("LateUpdate");
 	};
 
-	var oldTime = Time.time;
+	/*var oldTime = Time.time;
 	Time.worker = new Worker('js/FixedTime.js');
 	Time.worker.addEventListener('message', function(e){
 		Time.accumulated += Time.time - oldTime;
@@ -56,7 +68,7 @@ function (
 			Game.raiseEvent("FixedUpdate");
 			if(Game.ammoWorld){
 				Game.raiseEvent("AmmoUpdate");
-				Game.ammoWorld.stepSimulation(Time.fixedDT, 0);
+				Game.ammoWorld.stepSimulation(Time.fixedDT, 1);
 			}
 			Time.accumulated -= Time.fixedDT;
 		}
@@ -64,7 +76,7 @@ function (
 		Time.negAlpha = 1 - Time.alpha;
 		oldTime = Time.time;
 	}, false);
-	Time.worker.postMessage(Time.fixedDT);
+	Time.worker.postMessage(Time.fixedDT);*/
 
 	return Time;
 });

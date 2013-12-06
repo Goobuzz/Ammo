@@ -12,8 +12,10 @@ define([
 	Time
 ){
 	var quaternion = new Quaternion();
+	//var vec = new Vector3();
 	var ptrans = new Ammo.btTransform();
 	var pquat = new Ammo.btQuaternion(0,0,0,1);
+	var pvec = new Ammo.btVector3();
 	var origin = new Ammo.btVector3();
 	"use strict";
 	function RigidbodyComponent(entity, configs){
@@ -81,34 +83,48 @@ define([
 		this.offsetPosition.y = n1;
 		this.offsetPosition.z = n2;
 	}
+	RigidbodyComponent.prototype.setRotation = function(rot0){
+		quaternion.fromRotationMatrix(rot0);
+		this.ammoRB.getMotionState().getWorldTransform(ptrans);
+		pquat = ptrans.getRotation();
+		pquat.setValue(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+		ptrans.setRotation(pquat);
+		this.ammoRB.setWorldTransform(ptrans);
+
+		this.newRot.setd(quaternion.x, quaternion.y, quaternion.z, quaternion.w);
+	}
+	RigidbodyComponent.prototype.setLinearVelocity = function(v1){
+		pvec.setValue(v1.x, v1.y, v1.z);
+		this.ammoRB.setLinearVelocity(pvec);
+	};
+	RigidbodyComponent.prototype.getLinearVelocity = function(){
+		return this.ammoRB.getLinearVelocity();
+	};
 
 	RigidbodyComponent.prototype._ammoUpdate = function(){
-		this.oldPos.copy(this.newPos);
-		this.oldRot.copy(this.newRot);
 		this.ammoRB.getMotionState().getWorldTransform(ptrans);
 		origin = ptrans.getOrigin();
 		pquat = ptrans.getRotation();
 		
-
 		this.newPos.setd(origin.x()+this.offsetPosition.x, origin.y()+this.offsetPosition.y, origin.z()+this.offsetPosition.z);
 		this.newRot.setd(pquat.x(), pquat.y(), pquat.z(), pquat.w());
-	}
+	};
 
 	RigidbodyComponent.prototype._renderUpdate = function(){
 		this.position.setd(
-			(this.newPos.x * Time.alpha) + (this.oldPos.x * Time.negAlpha),
-			(this.newPos.y * Time.alpha) + (this.oldPos.y * Time.negAlpha),
-			(this.newPos.z * Time.alpha) + (this.oldPos.z * Time.negAlpha)
+			this.newPos.x,
+			this.newPos.y,
+			this.newPos.z
 			);
 		quaternion.setd(
-			(this.newRot.x * Time.alpha) + (this.oldRot.x * Time.negAlpha),
-			(this.newRot.y * Time.alpha) + (this.oldRot.y * Time.negAlpha),
-			(this.newRot.z * Time.alpha) + (this.oldRot.z * Time.negAlpha),
-			(this.newRot.w * Time.alpha) + (this.oldRot.w * Time.negAlpha)
+			this.newRot.x,
+			this.newRot.y,
+			this.newRot.z,
+			this.newRot.w
 			);
 		this.entity.transformComponent.transform.rotation.copyQuaternion(quaternion);
 		this.entity.transformComponent.setUpdated();
-	}
+	};
 
 	return RigidbodyComponent;
 });

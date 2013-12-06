@@ -2,6 +2,7 @@ define([
 	'goo/entities/components/Component',
 	'goo/math/Vector3',
 	'goo/math/Quaternion',
+	'goo/math/Matrix3x3',
 	'goo/util/GameUtils',
 	'js/Input',
 	'js/Game',
@@ -14,6 +15,7 @@ define([
 	Component,
 	Vector3,
 	Quaternion,
+	Matrix3x3,
 	GameUtils,
 	Input,
 	Game,
@@ -24,56 +26,52 @@ define([
 	EntityUtils
 ){
 	"use strict";
-	var physTransform = new Ammo.btTransform();
-	var pquat;
+	//var physTransform = new Ammo.btTransform();
+	//var pquat;
+	var quaternion = new Quaternion();
 	function OverShoulderCam(ent){
 		this.type = "OverShoulderCam";
 		this.entity = ent;
 		this.ray = new Ray();
 		this.verticalTic = 0.01;
 		this.horizontalTic = 0.01;
-		this.p0Rot = new Vector3();
-		this.p1Rot = new Vector3();
-		this.oldPos = new Vector3();
-		this.newPos = new Vector3();
-		this.wantDistance = 4;
 
-		this.pivot0 = Game.world.createEntity("Cam Pivot0");
-		this.pivot0.addToWorld();
-		this.pivot0.transformComponent.setTranslation(0,1.25,0);
-		this.entity.transformComponent.attachChild(this.pivot0.transformComponent);
-		this.entity.transformComponent.setUpdated();
-		this.pivot1 = Game.world.createEntity("Cam Pivot1");
-		this.pivot1.addToWorld();
-		this.pivot1.transformComponent.setTranslation(-0.25, 0, 0);
-		this.pivot1.transformComponent.setRotation(-15*(Math.PI/180),0,0);
-		this.pivot0.transformComponent.attachChild(this.pivot1.transformComponent);
-		this.pivot0.transformComponent.setUpdated();
+		this.targetPosition = ent.transformComponent.transform.translation;
+		this.targetOffset = new Vector3(0,1.25,0);
+		//this.offset = new Vector3();
+		this.camTarget = new Vector3();
+		this.offsetRotation = new Matrix3x3();
+		this.yaw = 0;
+		this.pitch = 0;
+		this.roll = 0.0;
 
-		this.pivot2 = Game.world.createEntity("Cam Pivot2");
-		this.pivot2.addToWorld();
-		this.pivot2.transformComponent.setRotation(0,Math.PI,0);
-		this.pivot2.transformComponent.setTranslation(0,0,-this.wantDistance);
-		this.pivot2.transformComponent.setUpdated();
+		this.wantPos = new Vector3();
+		this.wantRot = new Vector3();
 
-		this.pivot1.transformComponent.attachChild(this.pivot2.transformComponent);
-		this.pivot1.transformComponent.setUpdated();
+		this.wantDistance = 3;
+		this.distance = 3;
 		
 		this.camEntity = Game.world.createEntity("View Cam");
 		this.camEntity.addToWorld();
 		
 		var cam = new Camera(45, 1, 0.1, 100);
 		this.camEntity.setComponent(new CameraComponent(cam));
-		ent.transformComponent.attachChild(this.pivot0.transformComponent);
 
 		Game.viewCam = this.camEntity;
 
 		Game.register("MouseMove", this, mouseMove);
 		Game.register("MouseButton1", this, mouseButton1);
-		Game.register("LateUpdate", this, lateUpdate);
+		Game.register("LateUpdate", this, this.lateUpdate);
 	}
 	OverShoulderCam.prototype = Object.create(Component.prototype);
 	OverShoulderCam.prototype = OverShoulderCam;
+
+	OverShoulderCam.prototype.setYaw = function(n0){
+		this.yaw = n0;
+	}
+	OverShoulderCam.prototype.setOffsetRotation = function(rot0){
+		this.offsetRotation.copy(rot0);
+	}
 
 	function mouseButton1(){
 		if(true == Input.mouseButton[1]){
@@ -88,52 +86,72 @@ define([
 		if(!document.pointerLockElement){return;}
 		// mouse Y - Camera X axis
 		if(Input.movement.y){
-			this.pivot1.transformComponent.transform.rotation.toAngles(this.p1Rot);
-			this.p1Rot.x += Input.movement.y * this.verticalTic;
-			this.p1Rot.x = Math.min(Math.max(this.p1Rot.x, -Math.PI*0.5), Math.PI*0.5);
-			this.pivot1.transformComponent.transform.rotation.fromAngles(this.p1Rot.x, this.p1Rot.y, this.p1Rot.z);
-			this.pivot1.transformComponent.setUpdated();
+			this.pitch += Input.movement.y * this.verticalTic;
+			this.pitch = Math.min(Math.max(this.pitch, -Math.PI*0.5), Math.PI*0.5);
 		}
 
 		// mouse X - Camera Y axis
 		if(Input.movement.x){
-			this.pivot0.transformComponent.transform.rotation.toAngles(this.p0Rot);
-			this.p0Rot.y -= Input.movement.x * this.horizontalTic;
-			if(this.p0Rot.y < -2*Math.PI){
-				this.p0Rot.y += 2*Math.PI;
+			this.yaw += Input.movement.x * this.horizontalTic;
+			if(this.yaw < -2*Math.PI){
+				this.yaw += 2*Math.PI;
 			}
-			if(this.p0Rot.y > 2*Math.PI){
-				this.p0Rot.y -= 2*Math.PI;
+			if(this.yaw > 2*Math.PI){
+				this.yaw -= 2*Math.PI;
 			}
-			if(this.p0Rot.y > 2*Math.PI){
-				this.p0Rot.y = 2*Math.PI;
+			if(this.yaw > 2*Math.PI){
+				this.yaw = 2*Math.PI;
 			}
-			if(this.p0Rot.y < -2*Math.PI){
-				this.p0Rot.y = -2*Math.PI;
+			if(this.yaw < -2*Math.PI){
+				this.yaw = -2*Math.PI;
 			}
-			//console.log(this.p0Rot.y*(180/Math.PI));
-			this.pivot0.transformComponent.transform.rotation.fromAngles(this.p0Rot.x, this.p0Rot.y, this.p0Rot.z);
-			this.pivot0.transformComponent.setUpdated();
 		}
 	}
+	var targetRot = new Vector3();
+	OverShoulderCam.prototype.lateUpdate = function(){
+		this.offsetRotation.toAngles(targetRot);
 
-	function lateUpdate(){
-		this.ray.origin.copy(this.pivot1.transformComponent.worldTransform.translation);
-		Vector3.sub(this.pivot2.transformComponent.worldTransform.translation, this.ray.origin, this.ray.direction);
+		this.targetOffset.x = -Math.cos(this.yaw)*0.25;
+		this.targetOffset.z = -Math.sin(this.yaw)*0.25;
+
+		Vector3.add(this.targetOffset, this.targetPosition, this.camTarget);
+
+		DistanceElevationHeading(this.wantDistance, this.pitch, this.yaw, this.wantPos);
+		this.wantPos.add(this.camTarget);
+
+		this.ray.origin.copy(this.camTarget);
+		Vector3.sub(this.wantPos, this.ray.origin, this.ray.direction);
 		this.ray.direction.normalize();
-		this.pivot2.transformComponent.transform.translation.z = -this.wantDistance;
+
+		this.distance = this.wantDistance;
 		var hit = Game.castRay(this.ray, 1);
 		if(hit != null){
-			console.log(hit.distance);
 			if(hit.distance < this.wantDistance){
-				this.pivot2.transformComponent.transform.translation.z = -hit.distance;
+				this.distance = hit.distance;
 			}
 		}
-		this.pivot2.transformComponent.setUpdated();
-		this.camEntity.transformComponent.setTranslation(this.pivot2.transformComponent.worldTransform.translation);
-		// change this
-		this.camEntity.transformComponent.lookAt(this.pivot1.transformComponent.worldTransform.translation, Vector3.UNIT_Y);
+
+		DistanceElevationHeading(this.distance, this.pitch, this.yaw, this.wantPos);
+		this.wantPos.add(this.camTarget);
+
+		//console.log(this.wantPos.x+','+this.wantPos.y+','+this.wantPos.z);
+		this.camEntity.transformComponent.transform.translation.lerp(this.wantPos, 20*Time.dt);
+		this.camEntity.transformComponent.transform.lookAt(this.camTarget, Vector3.UNIT_Y);
 		this.camEntity.transformComponent.setUpdated();
+
+		Game.userTorso.transformComponent.transform.rotation.fromAngles(0, -targetRot.y-this.yaw, 0);
+		Game.userTorso.transformComponent.setUpdated();
+	}
+
+	function DistanceElevationHeading(distance, elevation, heading, v0){
+		var radH = (heading-(Math.PI*0.5)); // Mathf.Deg2Rad;
+		var radE = elevation//*Mathf.Deg2Rad;
+		var a = distance * Math.cos(radE);
+		v0 = typeof v0 !== 'undefined' ? v0 : new Vector3();
+		v0.x = a*Math.cos(radH);
+		v0.y = distance*Math.sin(radE);
+		v0.z = a*Math.sin(radH);
+		return v0;
 	}
 
 	return OverShoulderCam;
