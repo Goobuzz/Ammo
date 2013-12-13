@@ -44,6 +44,8 @@ define([
 		this.yaw = 0;
 		this.pitch = 0;
 		this.roll = 0.0;
+		this.yawValue = 0;
+		this.pitchValue = 0;
 
 		this.wantPos = new Vector3();
 		this.wantRot = new Vector3();
@@ -58,9 +60,14 @@ define([
 		this.camEntity.setComponent(new CameraComponent(cam));
 
 		Game.viewCam = this.camEntity;
-
+		
 		Game.register("MouseMove", this, mouseMove);
-		Game.register("MouseButton1", this, mouseButton1);
+		Game.register("LeftClick", this, mouseButton1);
+
+		Game.register("LookYAxis", this, lookYAxis);
+		Game.register("LookXAxis", this, lookXAxis);
+
+		Game.register("Update", this, this.update);
 		Game.register("LateUpdate", this, this.lateUpdate);
 	}
 	OverShoulderCam.prototype = Object.create(Component.prototype);
@@ -74,10 +81,44 @@ define([
 	}
 
 	function mouseButton1(){
-		if(true == Input.mouseButton[1]){
+		if(true == Input.Action.LeftClick){
 			if(!document.pointerLockElement) {
 				GameUtils.requestPointerLock();
 				return;
+			}
+		}
+	}
+
+	function lookXAxis(value){
+		this.yawValue = (value > 0.1) ? value : (value < -0.1) ? value : 0;
+	}
+	function lookYAxis(value){
+		this.pitchValue = (value > 0.1) ? value : (value < -0.1) ? value : 0;
+	}
+
+	OverShoulderCam.prototype.update = function(){
+		if(this.pitchValue != 0){
+			this.pitch += this.pitchValue * this.verticalTic * 2.5;
+			if(this.pitch < -80*(Math.PI/180)){
+				this.pitch = -80*(Math.PI/180);
+			}
+			if(this.pitch > 80*(Math.PI/180)){
+				this.pitch = 80*(Math.PI/180);
+			}
+		}
+		if(this.yawValue != 0){
+			this.yaw += this.yawValue * this.horizontalTic*2.5;
+			if(this.yaw < -2*Math.PI){
+				this.yaw += 2*Math.PI;
+			}
+			if(this.yaw > 2*Math.PI){
+				this.yaw -= 2*Math.PI;
+			}
+			if(this.yaw > 2*Math.PI){
+				this.yaw = 2*Math.PI;
+			}
+			if(this.yaw < -2*Math.PI){
+				this.yaw = -2*Math.PI;
 			}
 		}
 	}
@@ -87,7 +128,12 @@ define([
 		// mouse Y - Camera X axis
 		if(Input.movement.y){
 			this.pitch += Input.movement.y * this.verticalTic;
-			this.pitch = Math.min(Math.max(this.pitch, -Math.PI*0.5), Math.PI*0.5);
+			if(this.pitch < -80*(Math.PI/180)){
+				this.pitch = -80*(Math.PI/180);
+			}
+			if(this.pitch > 80*(Math.PI/180)){
+				this.pitch = 80*(Math.PI/180);
+			}
 		}
 
 		// mouse X - Camera Y axis

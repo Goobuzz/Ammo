@@ -6,59 +6,217 @@ define([
 	Game
 ){
 	"use strict";
-	var view = null;
-	var _self = {};
-	_self.init = function(goo){
-		view = goo.renderer.domElement;
-		document.documentElement.addEventListener("mousedown", mouseDown, false);
-		//goo.renderer.domElement.addEventListener("mousedown", mouseDown, false);
-		document.documentElement.addEventListener("mouseup", mouseUp, false);
-		document.documentElement.addEventListener("mousemove", mouseMove, false);
-		document.body.addEventListener('keyup', keyUp, false);
-		document.body.addEventListener('keydown', keyDown, false);
+	var Input = {};
+	document.documentElement.addEventListener("mousedown", mouseDown, false);
+	document.documentElement.addEventListener("mouseup", mouseUp, false);
+	document.documentElement.addEventListener("mousemove", mouseMove, false);
+	document.documentElement.addEventListener("keyup", keyUp, false);
+	document.documentElement.addEventListener("keydown", keyDown, false);
+	
+	var gamepads = [];
+	var oldStates = [];
+	var oldGamepads = [];
+	var prevTimestamp = [];
+
+	var STICK_COUNT = 4;
+	var BUTTON_COUNT = 16;
+
+	function gamepadConnected(e){
+  		console.log("Gamepad Connected");
+  		console.log(e);
+  		gamepads.push(e.gamepad);
+  		updateGamepadStates();
+  		//Game.register("Update", this, pollGamepadState, -1);
+  	}
+  	function gamepadRemoved(e){
+  		console.log("Gamepad Removed");
+  		console.log(e);
+  		for(var i = 0, ilen = gamepads.length; i < ilen; i++){
+  			if(gamepads[i].index == e.gamepad.index){
+
+  				gamepads.splice(i, 1);
+  				break;
+  			}
+  		}
+  		updateGamepadStates();
+  		// check for gamepads.length and stop polling...
+  	}
+  	function gamepadButtonDown(e){
+  		console.log("Button Down");
+  		// e.button
+  		console.log(e);
+  	}
+  	function gamepadButtonUp(e){
+  		console.log("Button Up");
+  		// e.button
+  		console.log(e);
+  	}
+  	function gamepadAnalogMove(e){
+  		console.log("Analog");
+  		// e.axis, e.value
+  		console.log(e);
+  	}
+
+	var gamepadSupportAvailable = !!navigator.webkitGetGamepads || 
+		!!navigator.webkitGamepads ||
+		(navigator.userAgent.indexOf('Firefox/') != -1);
+
+	if (!gamepadSupportAvailable) {
+    	console.warn("No gamepad support.");
+  	} else {
+  		window.addEventListener('MozGamepadButtonDown', gamepadButtonDown);
+  		window.addEventListener('MozGamepadButtonUp', gamepadButtonUp);
+  		 window.addEventListener('MozGamepadConnected', gamepadConnected);
+		 window.addEventListener('MozGamepadDisconnected', gamepadRemoved);
+		 window.addEventListener('MozGamepadAxisMove', gamepadAnalogMove);
+		//window.addEventListener('gamepadconnected', gamepadConnected);
+		//window.addEventListener('gamepaddisconnected', gamepadRemoved);
+
+		if (!!navigator.webkitGamepads || !!navigator.webkitGetGamepads) {
+    		// start polling
+
+    		Game.register("Update", this, pollGamepadState, -1);
+    	}
+  	}
+  	
+	function pollGamepadChange(){
+		var gamepad = (navigator.webkitGetGamepads && navigator.webkitGetGamepads()) ||
+		navigator.webkitGamepads;
+		if(gamepad){
+			var changed = false;
+			gamepads = [];
+			for(var i = 0, ilen = gamepad.length; i < ilen; i++){
+				if(typeof gamepad[i] != oldGamepads[i]){
+					changed = true;
+					oldGamepads[i] = typeof gamepad[i];
+				}
+				if(gamepad[i]){
+					gamepads.push(gamepad[i]);
+				}
+			}
+			if(changed){
+				updateGamepadStates();
+			}
+		}
 	};
 
-	_self.mousePosition = new Vector2();
-	_self.mouseOld = new Vector2();
-	_self.mouseDelta = new Vector2();
-	_self.mouseButton = {};
-	_self.movement = new Vector2();
-	_self.keys = {};
+	function updateGamepadStates(){
+		oldStates = [];
+  		for(var i = 0, ilen = gamepads.length; i < ilen; i++){
+  			var buttons = [];
+  			var axes = [];
+  			for(var b = 0, blen = gamepads[i].buttons.length; b < blen; b++){
+  				buttons[b] = gamepads[i].buttons[b];
+  			}
+  			for(var a = 0, alen = gamepads[i].axes.length; a < alen; a++){
+  				axes[a] = gamepads[i].axes[a];
+  			}
+  			oldStates.push({buttons:buttons, axes:axes});
+  		}
+	}
 
-	/*
-	document.addEventListener("keydown", function(_e){
-		_e = _e || window.event;
-		
-		var key = (typeof _e.which === "undefined") ? _e.keyCode : _e.which;
-		if(null == Game._keyAssign[key]){return;}
-		if(true == Game.action[Game._keyAssign[key]]){return;}
-		Game.action[Game._keyAssign[key]] = true;
-		Game.raiseEvent(Game._keyAssign[key], true);
-	},false);
+	function pollGamepadState(){
+		pollGamepadChange();
+		for(var i = 0, ilen = gamepads.length; i < ilen; i++){
+			var gamepad = gamepads[i];
+			if(gamepad.timestamp && gamepad.timestamp == prevTimestamp[i]){continue;}
+			prevTimestamp[i] = gamepad.timestamp;
+			//console.log("State Changed");
+			for(var b = 0, blen = gamepad.buttons.length; b < blen; b++){
+				if(null == gamepadButtonAssign[i][b]){continue;}
+				if(oldStates[i].buttons[b] != gamepad.buttons[b]){
+					oldStates[i].buttons[b] = gamepad.buttons[b];
+					if(gamepad.buttons[b] == 0){
+						if(false == Input.Action[gamepadButtonAssign[i][b]]){continue;}
+						Input.Action[gamepadButtonAssign[i][b]] = false;
+						Game.raiseEvent(gamepadButtonAssign[i][b], false);
+					}
+					if(gamepad.buttons[b] == 1){
+						if(true == Input.Action[gamepadButtonAssign[i][b]]){continue;}
+						Input.Action[gamepadButtonAssign[i][b]] = true;
+						Game.raiseEvent(gamepadButtonAssign[i][b], true);
+					}
+				}
+			}
+			for(var a = 0, alen = gamepad.axes.length; a < alen; a++){
+				//console.log("gamepad:"+i+" axis:"+a+":"+gamepad.axes[a]);
+				if(null == gamepadAxesAssign[i][a]){continue;}
+				if(oldStates[i].axes[a] != gamepad.axes[a]){
+					oldStates[i].axes[a] = gamepad.axes[a];
+					Input.Action[gamepadAxesAssign[i][a]] = gamepad.axes[a];
+					Game.raiseEvent(gamepadAxesAssign[i][a], gamepad.axes[a]);
+				}
+			}
+		};
+	}
 
-	document.addEventListener("keyup", function(_e){
-		_e = _e || window.event;
+	var gamepadButtonAssign = [{},{},{},{}];
+	var gamepadAxesAssign = [{},{},{},{}];
 
-		var key = (typeof _e.which === "undefined") ? _e.keyCode : _e.which;
-		if(null == Game._keyAssign[key]){return;}
-		if(false == Game.action[Game._keyAssign[key]]){return;}
-		Game.action[Game._keyAssign[key]] = false;
-		Game.raiseEvent(Game._keyAssign[key], false);
-	},false);
-	*/
+	Input.assignGamepadAxisToAction = function(gamepad, axis, action){
+		if(null == gamepadAxesAssign[gamepad][axis]){
+			Input.Action[action] = false;
+		}
+		else{
+			console.warn("Gamepad:"+gamepad+" Axis:"+axis+" already assigned to Action:"+gamepadAxesAssign[gamepad][axis]);
+		}
+		gamepadAxesAssign[gamepad][axis] = action;
+	};
+
+	Input.assignGamepadButtonToAction = function(gamepad, button, action){
+		if(null == gamepadButtonAssign[gamepad][button]){
+			Input.Action[action] = false;
+		}
+		else{
+			console.warn("Gamepad:"+gamepad+" Button:"+button+" already assigned to Action:"+gamepadButtonAssign[gamepad][button]);
+		}
+		gamepadButtonAssign[gamepad][button] = action;
+	};
+
+	// onmousewheel
+	Input.mousePosition = new Vector2();
+	Input.mouseOld = new Vector2();
+	Input.mouseDelta = new Vector2();
+	Input.movement = new Vector2();
+	Input.Action = {};
+	var keyAssign = {};
+	var mouseButtonAssign = {};
+
+	Input.assignKeyToAction = function(key, action){
+		if(null == keyAssign[key]){
+			Input.Action[action] = false;
+		}
+		else{
+			console.warn("Key:"+key+" already assigned to Action:"+keyAssign[key]);
+		}
+		keyAssign[key] = action;
+	};
+	Input.assignMouseButtonToAction = function(button, action){
+		if(null == mouseButtonAssign[button]){
+			Input.Action[action] = false;
+		}
+		else{
+			console.warn("MouseButton:"+button+" already assigned to Action:"+mouseButtonAssign[button]);
+		}
+		mouseButtonAssign[button] = action;
+	};
 
 	function keyDown(e){
 		e = e || window.event;
 		var key = (typeof e.which === "undefined") ? e.keyCode : e.which;
-		_self.keys[key] = true;
-		Game.raiseEvent("Key"+key, true);
-	}
+		if(null == keyAssign[key]){return;}
+		if(true == Input.Action[keyAssign[key]]){return;}
+		Input.Action[keyAssign[key]] = true;
+		Game.raiseEvent(keyAssign[key], true);
+	};
 	function keyUp(e){
 		e = e || window.event;
 		var key = (typeof e.which === "undefined") ? e.keyCode : e.which;
-		_self.keys[key] = false;
-		Game.raiseEvent("Key"+key, false);
-	}
+		if(null == keyAssign[key]){return;}
+		if(false == Input.Action[keyAssign[key]]){return;}
+		Input.Action[keyAssign[key]] = false;
+		Game.raiseEvent(keyAssign[key], false);
+	};
 
 	function mouseDown(e){
 		updateMousePos(e);
@@ -79,8 +237,10 @@ define([
 					break;
 			};
 		}
-		_self.mouseButton[btn] = true;
-		Game.raiseEvent("MouseButton"+btn, true);
+		if(null == mouseButtonAssign[btn]){return;}
+		if(true == Input.Action[mouseButtonAssign[btn]]){return;}
+		Input.Action[mouseButtonAssign[btn]] = true;
+		Game.raiseEvent(mouseButtonAssign[btn], true);
 	};
 
 	function mouseUp(e){
@@ -102,8 +262,10 @@ define([
 					break;
 			};
 		}
-		_self.mouseButton[btn] = false;
-		Game.raiseEvent("MouseButton"+btn, false);
+		if(null == mouseButtonAssign[btn]){return;}
+		if(false == Input.Action[mouseButtonAssign[btn]]){return;}
+		Input.Action[mouseButtonAssign[btn]] = false;
+		Game.raiseEvent(mouseButtonAssign[btn], false);
 	};
 
 	function mouseMove(e){
@@ -116,22 +278,21 @@ define([
 		if (e && e.preventDefault) {e.preventDefault();}
 		if (e && e.stopPropagation) {e.stopPropagation();}
 		
-		_self.mousePosition.x = e.pageX ? e.pageX : e.clientX + (document.documentElement.scrollLeft) ||
+		Input.mousePosition.x = e.pageX ? e.pageX : e.clientX + (document.documentElement.scrollLeft) ||
 			(document.body.scrollLeft - document.documentElement.clientLeft);
 			
-		_self.mousePosition.y = e.pageY ? e.pageY : e.clientY + (document.documentElement.scrollTop) ||
+		Input.mousePosition.y = e.pageY ? e.pageY : e.clientY + (document.documentElement.scrollTop) ||
 			(document.body.scrollTop - document.documentElement.scrollTop);
 
-		_self.mousePosition.x -= view.offsetLeft;
-		_self.mousePosition.y -= view.offsetTop;
-		_self.movement.x = e.movementX;
-		_self.movement.y = e.movementY;
-		_self.mouseDelta.x = _self.mouseOld.x - _self.mousePosition.x;
-		_self.mouseDelta.y = _self.mouseOld.y - _self.mousePosition.y;
-		_self.mouseOld.x = _self.mousePosition.x;
-		_self.mouseOld.y = _self.mousePosition.y;
+		Input.mousePosition.x -= Game.renderer.domElement.offsetLeft;
+		Input.mousePosition.y -= Game.renderer.domElement.offsetTop;
+		Input.movement.x = e.movementX;
+		Input.movement.y = e.movementY;
+		Input.mouseDelta.x = Input.mouseOld.x - Input.mousePosition.x;
+		Input.mouseDelta.y = Input.mouseOld.y - Input.mousePosition.y;
+		Input.mouseOld.x = Input.mousePosition.x;
+		Input.mouseOld.y = Input.mousePosition.y;
 	};
 
-	
-	return _self;
+	return Input;
 });

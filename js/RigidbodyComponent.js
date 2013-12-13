@@ -20,9 +20,9 @@ define([
 	"use strict";
 	function RigidbodyComponent(entity, configs){
 		this.type = "RigidbodyComponent";
-		console.log(entity);
+		//console.log(entity);
 
-		console.log(entity.getComponent("ColliderComponent"));
+		//console.log(entity.getComponent("ColliderComponent"));
 		if(null == entity.colliderComponent){console.error("ColliderComponent required!");return;}
 		
 		this.entity = entity;
@@ -52,7 +52,7 @@ define([
 		Game.ammoWorld.addRigidBody(this.ammoRB);
 		if(this.mass > 0){
 			Game.register("AmmoUpdate", this, this._ammoUpdate);
-			Game.register("RenderUpdate", this, this._renderUpdate);
+		//	Game.register("RenderUpdate", this, this._renderUpdate);
 		}
 	};
 
@@ -100,6 +100,14 @@ define([
 	RigidbodyComponent.prototype.getLinearVelocity = function(){
 		return this.ammoRB.getLinearVelocity();
 	};
+	RigidbodyComponent.prototype.applyCentralImpulse = function(n0, n1, n2){
+		pvec.setValue(n0, n1, n2);
+		this.ammoRB.applyCentralImpulse(pvec);
+	};
+	RigidbodyComponent.prototype.applyCentralForce = function(n0, n1, n2){
+		pvec.setValue(n0, n1, n2);
+		this.ammoRB.applyCentralForce(pvec);
+	};
 
 	RigidbodyComponent.prototype._ammoUpdate = function(){
 		this.ammoRB.getMotionState().getWorldTransform(ptrans);
@@ -108,9 +116,6 @@ define([
 		
 		this.newPos.setd(origin.x()+this.offsetPosition.x, origin.y()+this.offsetPosition.y, origin.z()+this.offsetPosition.z);
 		this.newRot.setd(pquat.x(), pquat.y(), pquat.z(), pquat.w());
-	};
-
-	RigidbodyComponent.prototype._renderUpdate = function(){
 		this.position.setd(
 			this.newPos.x,
 			this.newPos.y,
@@ -125,6 +130,22 @@ define([
 		this.entity.transformComponent.transform.rotation.copyQuaternion(quaternion);
 		this.entity.transformComponent.setUpdated();
 	};
+
+	/*RigidbodyComponent.prototype._renderUpdate = function(){
+		this.position.setd(
+			this.newPos.x,
+			this.newPos.y,
+			this.newPos.z
+			);
+		quaternion.setd(
+			this.newRot.x,
+			this.newRot.y,
+			this.newRot.z,
+			this.newRot.w
+			);
+		this.entity.transformComponent.transform.rotation.copyQuaternion(quaternion);
+		this.entity.transformComponent.setUpdated();
+	};*/
 
 	return RigidbodyComponent;
 });

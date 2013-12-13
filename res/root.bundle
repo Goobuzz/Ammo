@@ -5,9 +5,7 @@
             "Level/materials/Level_Material.material",
             "Level/entities/RootNode.entity",
             "Level/entities/Box01_0.entity",
-            "Level/binaries/1386342071_data.bin",
-            "Level/entities/PointLight.entity",
-            "Level/entities/PointLight_0.entity"
+            "Level/binaries/1386375780_data.bin"
         ],
         "name": "Level",
         "ref": "Level/Level.group"
@@ -49,130 +47,6 @@
         "name": "Box01",
         "nodeType": "Mesh",
         "ref": "Level/entities/Box01_0.entity"
-    },
-    "Level/entities/PointLight.entity": {
-        "components": {
-            "light": {
-                "attenuate": true,
-                "color": [
-                    0.9636363636363636,
-                    0.9116159278737791,
-                    0.34165289256198345,
-                    1
-                ],
-                "direction": [
-                    0,
-                    0,
-                    0
-                ],
-                "intensity": 1,
-                "lightCookie": null,
-                "range": 50,
-                "shadowCaster": false,
-                "shadowSettings": {
-                    "darkness": 0,
-                    "far": 50,
-                    "fov": 55,
-                    "near": 1,
-                    "projection": "Perspective",
-                    "resolution": [
-                        256,
-                        256
-                    ],
-                    "shadowType": "VSM",
-                    "size": 400,
-                    "type": "Blur",
-                    "upVector": [
-                        0,
-                        1,
-                        0
-                    ]
-                },
-                "specularIntensity": 1,
-                "type": "PointLight"
-            },
-            "transform": {
-                "rotation": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "translation": [
-                    -8.984298706054688,
-                    25.630630493164062,
-                    -14.283855438232422
-                ]
-            }
-        },
-        "name": "PointLight",
-        "ref": "Level/entities/PointLight.entity"
-    },
-    "Level/entities/PointLight_0.entity": {
-        "components": {
-            "light": {
-                "attenuate": true,
-                "color": [
-                    0.5949024793388428,
-                    0.16181818181818178,
-                    0.8090909090909091,
-                    1
-                ],
-                "direction": [
-                    0,
-                    0,
-                    0
-                ],
-                "intensity": 1.06,
-                "lightCookie": null,
-                "range": 50,
-                "shadowCaster": false,
-                "shadowSettings": {
-                    "darkness": 0,
-                    "far": 50,
-                    "fov": 55,
-                    "near": 1,
-                    "projection": "Perspective",
-                    "resolution": [
-                        256,
-                        256
-                    ],
-                    "shadowType": "VSM",
-                    "size": 400,
-                    "type": "Blur",
-                    "upVector": [
-                        0,
-                        1,
-                        0
-                    ]
-                },
-                "specularIntensity": 1,
-                "type": "PointLight"
-            },
-            "transform": {
-                "rotation": [
-                    0,
-                    0,
-                    0
-                ],
-                "scale": [
-                    1,
-                    1,
-                    1
-                ],
-                "translation": [
-                    35.461585998535156,
-                    25.630630493164062,
-                    20.440135955810547
-                ]
-            }
-        },
-        "name": "PointLight",
-        "ref": "Level/entities/PointLight_0.entity"
     },
     "Level/entities/RootNode.entity": {
         "components": {
@@ -273,7 +147,7 @@
         }
     },
     "Level/meshes/Box01_0.mesh": {
-        "binaryRef": "Level/binaries/1386342071_data.bin",
+        "binaryRef": "Level/binaries/1386375780_data.bin",
         "boundingVolume": {
             "max": [
                 23.88897132873535,
@@ -325,6 +199,128 @@
             "float32"
         ]
     },
+    "entities/DirectionalLight.entity": {
+        "components": {
+            "light": {
+                "attenuate": true,
+                "color": [
+                    1,
+                    0.9163636363636364,
+                    0,
+                    1
+                ],
+                "direction": [
+                    0,
+                    0,
+                    0
+                ],
+                "intensity": 1,
+                "lightCookie": null,
+                "shadowCaster": false,
+                "shadowSettings": {
+                    "darkness": 0,
+                    "far": 1000,
+                    "fov": 55,
+                    "near": 1,
+                    "projection": "Parallel",
+                    "resolution": [
+                        256,
+                        256
+                    ],
+                    "shadowType": "VSM",
+                    "size": 400,
+                    "type": "Blur",
+                    "upVector": [
+                        0,
+                        1,
+                        0
+                    ]
+                },
+                "specularIntensity": 1,
+                "type": "DirectionalLight"
+            },
+            "transform": {
+                "rotation": [
+                    -35.33153721791129,
+                    0,
+                    -17.38282460749328
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "translation": [
+                    0,
+                    0,
+                    0
+                ]
+            }
+        },
+        "name": "DirectionalLight",
+        "ref": "entities/DirectionalLight.entity"
+    },
+    "entities/DirectionalLight_0.entity": {
+        "components": {
+            "light": {
+                "attenuate": true,
+                "color": [
+                    0.625454545454545,
+                    0,
+                    1,
+                    1
+                ],
+                "direction": [
+                    0,
+                    0,
+                    0
+                ],
+                "intensity": 1,
+                "lightCookie": null,
+                "shadowCaster": false,
+                "shadowSettings": {
+                    "darkness": 0,
+                    "far": 1000,
+                    "fov": 55,
+                    "near": 1,
+                    "projection": "Parallel",
+                    "resolution": [
+                        256,
+                        256
+                    ],
+                    "shadowType": "VSM",
+                    "size": 400,
+                    "type": "Blur",
+                    "upVector": [
+                        0,
+                        1,
+                        0
+                    ]
+                },
+                "specularIntensity": 1,
+                "type": "DirectionalLight"
+            },
+            "transform": {
+                "rotation": [
+                    -9.54409141218374,
+                    -14.482359163237978,
+                    -3.2591741728596784
+                ],
+                "scale": [
+                    1,
+                    1,
+                    1
+                ],
+                "translation": [
+                    0.25,
+                    0,
+                    0.25
+                ]
+            }
+        },
+        "name": "DirectionalLight",
+        "ref": "entities/DirectionalLight_0.entity"
+    },
     "posteffects/Bleach.posteffect": {
         "enabled": false,
         "name": "Bleach",
@@ -337,10 +333,10 @@
         "enabled": true,
         "name": "Bloom",
         "options": {
-            "brightness": -65,
-            "contrast": -8,
+            "brightness": -46,
+            "contrast": 76,
             "opacity": 100,
-            "size": 2
+            "size": 2.1
         },
         "ref": "posteffects/Bloom.posteffect"
     },
@@ -396,14 +392,14 @@
             0.78,
             1
         ],
-        "created": "2013-12-06T15:00:01.791327",
+        "created": "2013-12-07T00:21:39.416862",
         "deleted": false,
         "edit": [],
         "entityRefs": [
             "Level/entities/RootNode.entity",
             "Level/entities/Box01_0.entity",
-            "Level/entities/PointLight.entity",
-            "Level/entities/PointLight_0.entity"
+            "entities/DirectionalLight.entity",
+            "entities/DirectionalLight_0.entity"
         ],
         "fogColor": [
             1,
@@ -421,9 +417,9 @@
             "Level/Level.group",
             "root.group"
         ],
-        "id": "PLLRr7DzSx-A-F_ES2QIwA",
+        "id": "8VwKHaTfR5K9tvs5NcsasA",
         "licenseType": "CC0",
-        "modified": "2013-12-06T15:00:01.791327",
+        "modified": "2013-12-07T00:21:39.416862",
         "name": "Default Goo Project",
         "originalLicenseType": null,
         "own": [
@@ -464,6 +460,8 @@
     },
     "root.group": {
         "libraryRefs": [
+            "entities/DirectionalLight.entity",
+            "entities/DirectionalLight_0.entity",
             "posteffects/Sepia.posteffect",
             "posteffects/Bloom.posteffect",
             "posteffects/Grain.posteffect",

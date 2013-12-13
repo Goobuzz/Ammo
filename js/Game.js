@@ -19,25 +19,8 @@ define([
 		manuallyStartGameLoop: false,
 		tpfSmoothingCount:1
 	});
+	Game.doRender = false;
 
-	//Game.renderer.domElement.id = 'goo';
-	//document.body.appendChild(Game.renderer.domElement);
-
-   /* var rayStart = new Ammo.btVector3();
-    var rayEnd = new Ammo.btVector3();
-    var hitResult = new Ammo.btCollisionWorld.ClosestRayResultCallback(rayStart, rayEnd);
-    Game.castRay = function(from, to){
-    	rayStart.setValue(from.x, from.y, from.z);
-    	rayEnd.setValue(to.x, to.y, to.z);
-    	Game.ammoWorld.rayTest(rayStart, rayEnd, hitResult);
-    	if(hitResult.hasHit()){
-    		return {point:hitResult.m_hitPointWorld, normal:hitResult.m_hitNormalWorld};
-    	}
-    	else{
-    		return null;
-    	}
-    }*/
-	
 	var picking = new PickingSystem({pickLogic: new PrimitivePickLogic()});
     var v1 = new Vector3();
     var v2 = new Vector3();
@@ -109,16 +92,16 @@ define([
 	    	}
 	    }
 		picking.hit = hit;
-    }
+    };
 	
     Game.castRay = function(ray, mask, all){
-
     	picking.pickRay = ray;
     	picking.mask = mask;
     	picking.all = all;
     	picking._process();
     	return picking.hit;
-    }
+    };
+    Object.freeze(Game.castRay);
 
 	var listeners = {};
 
@@ -178,5 +161,8 @@ define([
 		return Game;
 	}
 	Object.freeze(Game.raiseEvent);
+
+	Game.renderer.domElement.id = 'goo';
+	document.body.appendChild(Game.renderer.domElement);
 	return Game;
 });

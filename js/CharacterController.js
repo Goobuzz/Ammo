@@ -24,6 +24,13 @@ define([
 	function CharacterController(entity){
 		this.type = "CharacterController";
 		this.entity = entity;
+
+		//if (true == Input.keys[87]) // W
+		//if (true == Input.keys[83]) // S
+		//if (true == Input.keys[65]) // A
+		//if (true == Input.keys[68]) // D
+		//if (true == Input.keys[32]) // space
+		
 		//this.newPos = new Vector3();
 		//this.oldPos = new Vector3();
 
@@ -50,13 +57,13 @@ define([
 		//this.yaw = 0.0;
 
 		Game.register("Update", this, this.update);
-		Game.register("MouseButton1", this, this.mouseButton1);
+		Game.register("LeftClick", this, this.mouseButton1);
 	};
 	CharacterController.prototype = Object.create(Component.prototype);
 	CharacterController.constructor = CharacterController;
 
 	CharacterController.prototype.mouseButton1 = function(){
-		if(true == Input.mouseButton[1]){
+		if(true == Input.Action.LeftClick){
 			if(!document.pointerLockElement){return;}
 			this.turnCamera();
 		}
@@ -69,7 +76,7 @@ define([
 		rot.toAngles(rotVec);
 		rotVec.x = 0;
 		rotVec.z = 0;
-		rotVec.y = typeof n0 !== 'undefined' ? Math.PI+n0+rotVec.y : Math.PI+rotVec.y;
+		rotVec.y = (typeof n0 !== 'undefined') ? Math.PI+n0+rotVec.y : Math.PI+rotVec.y;
 
 		if(rotVec.y < -2*Math.PI){
 			rotVec.y += 2*Math.PI;
@@ -94,6 +101,8 @@ define([
 		this.movement.z = this.entity.rigidbodyComponent.getLinearVelocity().z();
 		this.movement.y = Math.sqrt(2*20*this.jumpHeight)*this.entity.rigidbodyComponent.mass;
 		this.entity.rigidbodyComponent.setLinearVelocity(this.movement);
+		//console.log("Jump");
+		//this.entity.rigidbodyComponent.applyCentralImpulse(0, Math.sqrt(2*20*this.jumpHeight)*this.entity.rigidbodyComponent.mass, 0);
 	}
 	CharacterController.prototype.update = function(){
         this.grounded = false;
@@ -104,14 +113,15 @@ define([
 
 		this.movement.copy(Vector3.ZERO);
 
-		if (true == Input.keys[87]) // W
+		if(true == Input.Action.Forward)
 			this.movement.add(this.direction);
-		if (true == Input.keys[83]) // S
+		if(true == Input.Action.Back)
 			this.movement.sub(this.direction);
-		if (true == Input.keys[65]) // A
+		if(true == Input.Action.Left)
 			this.movement.add(this.left);
-		if (true == Input.keys[68]) // D
-			this.movement.sub(this.left);
+		if(true == Input.Action.Right)
+		
+		this.movement.sub(this.left);
 		this.movement.normalize();
 
 
@@ -156,9 +166,11 @@ define([
 
 		this.movement.x*=this.speed;
 		this.movement.z*=this.speed;
+		//this.movement.y = 0;
 		this.movement.y = this.entity.rigidbodyComponent.getLinearVelocity().y();
+		//console.log(this.movement.y);
 
-		if (true == Input.keys[32]){
+		if(true == Input.Action.Jump){
 			if(true == this.grounded) { // space bar
 				// (2 * gravity * height)*mass
 				wantAnim = 0;
@@ -178,6 +190,10 @@ define([
 				}
 			}
 		}
+		if(this.movement.y < -20){
+			this.movement.y = -20;
+		}
+		//this.entity.rigidbodyComponent.applyCentralForce(this.movement.x, this.movement.y, this.movement.z);
 		this.entity.rigidbodyComponent.setLinearVelocity(this.movement);
 		Game.userLeggs.animationComponent.transitionTo(Game.userLeggs.animationComponent.getStates()[wantAnim]);
 		Game.userTorso.animationComponent.transitionTo(Game.userTorso.animationComponent.getStates()[wantAnim]);
